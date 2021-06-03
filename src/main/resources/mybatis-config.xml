@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <typeAliases>
+        <package name="pojo"/>
+    </typeAliases>
+
+    <!--    resource mappers作用：引用类路径下的sql映射文件
+               class 注册接口； 有sql映射文件，映射文件名必须和接口同名，并且放在与接口统一目录下，
+                  把sql映射文件注册到全局配置文件中
+        -->
+    <mappers>
+        <mapper resource="dao/BookMapper.xml"></mapper>
+    </mappers>
+
+
+</configuration>

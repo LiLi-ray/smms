@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--整合Mybatis-->
+    <!--1.关联数据库文件   location指定配置文件的位置-->
+    <context:property-placeholder location="classpath:database.properties"/>
+
+    <!--2.数据库连接池-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <!--数据库的基本配置-->
+        <property name="driverClass" value="${jdbc.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <!--3.sqlSessionFactory-->
+    <!--.spring一启动就去创建sqlSessionFactory对象-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!--关联mybatis-->
+        <!--指的定全局配置文件位置（mybatis-config.xml），     关联mybatis
+        classpath  是指类路径下的意思-->
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <!--指定sql映射文件的位置
+        <property name="mapperLocations" value="classpath: /  /dao/*.xml"/>-->
+    </bean>
+
+
+    <!--4.注册dao层Bean-->
+    <!--动态实现dao接口注入Spring容器中-->
+    <!--  MapperScannerConfigurer这个类，它将会查找类路径下的映射器并自动将它们创建成MapperFactoryBean
+    我们创建一个MapperFactoryBean实例，
+    然后注入这个（比如：在这里是，BookDao接口）接口和sqlSessionFactory这两个属性。
+    （mybatis中提供的SqlSessionFactory接口，MapperFactoryBean会使用SqlSessionFactory创建SqlSession）
+
+    之后想使用 （比如：在这里是，BookDao接口）接口的话，
+    直接通过spring注入这个bean，然后就可以直接使用了，spring内部会创建一个这个接口的动态代理。-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--绑定sqlSessionFactory-->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <!--扫描包-->
+        <property name="basePackage" value="dao"/>
+    </bean>
+
+    <!--5.扫描包-->
+    <!--扫描所有的mapper接口的实现，让这些mapper能够自动注入
+        base-package； mapper接口的包名-->
+    <context:component-scan base-package="dao"/>
+
+    <!--动态实现dao接口注入Spring容器中,
+    和上边 <mybatis-spring:scan base-package="com.forscan.dao"/>效果一样
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <-绑定sqlSessionFactory>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <扫描包>
+        <property name="basePackage" value="dao"/>
+    </bean>-->
+
+    <!--手动配置bean
+    <bean id="bookServiceImpl" class="com.forscan.service.BookServiceImpl">
+        <property name="bookDao" ref="bookDao"/>
+    </bean>-->
+
+</beans>
